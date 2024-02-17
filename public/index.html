@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+            body {
+                font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+                font-size: medium;
+            }
+            button {
+                font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+                font-size: larger;
+                border: 0;
+                padding: 10px 10px;
+                border-radius: 20px;
+                background-color: red;
+                color: black;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Ban users</h1>
+        <a href="/bans"><button id="banlist">See list of bans</button></a>
+        <div>
+            <input id="userid"><input id="auth">
+            <button id="banthem">Ban user</button>
+            <input type="checkbox" id="unban" class="unbancheckbox">
+        </div>
+        <div id="successes"></div>
+        <script src="/js/indexjs.js"></script>
+    </body>
+</html>
