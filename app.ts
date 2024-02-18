@@ -62,6 +62,22 @@ app.post('/unban', async (req: any, res: any) => {
     return;
 });
 
+app.get('/getmassbannage', async (req: any, res: any) => {
+    console.log("yooo")
+    if(!req.headers.userids) {
+        return;
+    }
+    var returnObject: any = {};
+    let ind: number = 0;
+    for(let userid in JSON.parse(req.headers.userids)) {
+        ++ind;
+        returnObject[ind] = (users2.indexOf(userid) == -1);
+    }
+    console.log(returnObject);
+    console.log(JSON.stringify(returnObject));
+    res.send(JSON.stringify(returnObject));
+});
+
 app.get('/', async (req: any, res: any) => {
     res.sendFile(__dirname + '/public/index.html');
 })
