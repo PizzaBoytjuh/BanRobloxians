@@ -17,7 +17,7 @@ document.getElementById("banthem")?.addEventListener('click', (e) => {
             if(res.status == 200) {
                 var tring = document.createElement('li');
                 tring.innerHTML = "Successfully banned " + userid.value;
-                auth.appendChild(tring);
+                div.appendChild(tring);
                 return;
             }
             var tring = document.createElement('li');
