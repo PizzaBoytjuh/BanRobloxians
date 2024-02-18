@@ -74,7 +74,7 @@ app.get('/getmassbannage', async (req: any, res: any) => {
     for(let userid in obj) {
         ++ind;
         console.log(userid, ind, obj[ind], users2.indexOf(obj[ind]))
-        returnObject[ind] = (users2.indexOf(obj[ind]) != -1);
+        returnObject[ind] = (users2.indexOf(obj[ind].toString()) != -1);
     }
     console.log(returnObject);
     console.log(JSON.stringify(returnObject));
