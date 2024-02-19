@@ -1,5 +1,3 @@
-/app.js
-/app.js.map
-/public/js/indexjs.js
-/public/js/indexjs.js.map
+**.js
+**.js.map
 node_modules/
