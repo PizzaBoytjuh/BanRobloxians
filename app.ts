@@ -6,9 +6,11 @@ const app = express()
 
 var Salt = bcrypt.genSaltSync(15)
 var pass: string = bcrypt.hashSync("yes i am very real men", Salt)
-Salt = bcrypt.genSaltSync(15)
-var superpass: string = bcrypt.hashSync("yes i am incredibly real men", Salt)
-Salt = null
+var Salt2 = bcrypt.genSaltSync(15)
+while(Salt2) {
+var superpass: string = bcrypt.hashSync("yes i am incredibly real men", Salt2)
+Salt2 = null;
+}
 
 var users: string = fs.readFileSync(__dirname + '/banned.txt').toString();
 var users2 = users.split("\n");
@@ -43,11 +45,11 @@ app.get('/isadmin', async (req: any, res: any) => {
 })
 
 app.post('/makeadmin', async (req: any, res: any) => {
-    if(!req.headers.userid || !req.headers.superauth) {
+    if(req.headers.userid == null || req.headers.superauth == null) {
         res.sendStatus(403);
         return;
     }
-    if(!await bcrypt.compare(req.headers.password, superpass)) {
+    if(!await bcrypt.compare(req.headers.superauth, superpass)) {
         res.sendStatus(403);
         return;
     }
@@ -55,7 +57,7 @@ app.post('/makeadmin', async (req: any, res: any) => {
         res.sendStatus(403);
         return;
     }
-    if(req.headers.makesu == true) {
+    if(req.headers.makesu == "true") {
         sus += '\n'+req.headers.userid;
         sus2.push(req.headers.userid);
         fs.writeFileSync(__dirname + '/superusers.txt', sus);
@@ -161,3 +163,11 @@ app.get('/bans', async (req: any, res: any) => {
 app.get('/js/indexjs.js', async (req: any, res: any) => {
     res.sendFile(__dirname + '/public/js/indexjs.js');
 });
+
+app.get('/admins', async (req: any, res: any) => {
+    res.sendFile(__dirname + '/admins.txt')
+})
+
+app.get('/superusers', async (req: any, res: any) => {
+    res.sendFile(__dirname + '/superusers.txt')
+})
