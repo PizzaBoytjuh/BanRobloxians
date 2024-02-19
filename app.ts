@@ -46,14 +46,17 @@ app.get('/isadmin', async (req: any, res: any) => {
 
 app.post('/makeadmin', async (req: any, res: any) => {
     if(req.headers.userid == null || req.headers.superauth == null) {
+        res.appendHeader("reason", "no headers")
         res.sendStatus(403);
         return;
     }
     if(!await bcrypt.compare(req.headers.superauth, superpass)) {
+        res.appendHeader("reason", "password no matchie")
         res.sendStatus(403);
         return;
     }
     if(admins2.indexOf(req.headers.userid) !== -1 || sus2.indexOf(req.headers.userid) !== -1) {
+        res.appendHeader("reason", "alr exists")
         res.sendStatus(403);
         return;
     }
@@ -66,13 +69,15 @@ app.post('/makeadmin', async (req: any, res: any) => {
     }
     admins += '\n'+req.headers.userid;
     admins2.push(req.headers.userid);
-    fs.writeFileSync(__dirname + '/admins.txt', admins);
+    fs.writeFile(__dirname + '/admins.txt', admins, async (err) => {
+        console.log(err)
+    });
     res.sendStatus(200);
     return;
 })
 
 app.post('/demote', async (req: any, res: any) => {
-    if(!await req.headers.userid || !await req.headers.superauth) {
+    if(!req.headers.userid || !req.headers.superauth) {
         res.sendStatus(403);
         return;
     }
@@ -86,7 +91,9 @@ app.post('/demote', async (req: any, res: any) => {
     }
     admins = admins.replace('\n'+req.headers.userid, '');
     admins2.splice(admins2.indexOf(req.headers.userid), 1);
-    fs.writeFileSync(__dirname + '/admins.txt', users);
+    fs.writeFile(__dirname + '/admins.txt', users, async (err) => {
+        console.log(err)
+    });
     res.sendStatus(200);
     return;
 })
@@ -106,7 +113,9 @@ app.post('/ban', async (req: any, res: any) => {
     }
     users += '\n'+req.headers.userid;
     users2.push(req.headers.userid);
-    fs.writeFileSync(__dirname + '/banned.txt', users);
+    fs.writeFile(__dirname + '/banned.txt', users, async (err) => {
+        console.log(err)
+    });
     res.sendStatus(200);
     return;
 });
@@ -127,7 +136,9 @@ app.post('/unban', async (req: any, res: any) => {
     }
     users = users.replace('\n'+req.headers.userid, '');
     users2.splice(users2.indexOf(req.headers.userid), 1);
-    fs.writeFileSync(__dirname + '/banned.txt', users);
+    fs.writeFile(__dirname + '/banned.txt', users, async (err) => {
+        console.log(err)
+    });
     res.sendStatus(200);
     return;
 });
@@ -156,6 +167,10 @@ app.get('/', async (req: any, res: any) => {
     res.sendFile(__dirname + '/public/index.html');
 })
 
+app.get('/adminmang', async (req: any, res: any) => {
+    res.sendFile(__dirname + '/public/adminmang.html');
+})
+
 app.get('/bans', async (req: any, res: any) => {
     res.sendFile(__dirname + '/banned.txt')
 });
@@ -164,10 +179,18 @@ app.get('/js/indexjs.js', async (req: any, res: any) => {
     res.sendFile(__dirname + '/public/js/indexjs.js');
 });
 
+app.get('/js/adminmangjs.js', async (req: any, res: any) => {
+    res.sendFile(__dirname + '/public/js/adminmangjs.js');
+});
+
 app.get('/admins', async (req: any, res: any) => {
     res.sendFile(__dirname + '/admins.txt')
 })
 
 app.get('/superusers', async (req: any, res: any) => {
     res.sendFile(__dirname + '/superusers.txt')
+})
+
+app.get('*', async (req: any, res: any) => {
+    res.sendFile(__dirname + '/public/404.html')
 })
