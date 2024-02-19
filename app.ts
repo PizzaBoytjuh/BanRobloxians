@@ -4,10 +4,21 @@ import * as bcrypt from 'bcrypt';
 
 const app = express()
 
-var Salt = await bcrypt.genSalt(15)
-var pass = await bcrypt.hash("yes i am very real men", Salt);
-Salt = await bcrypt.genSalt(15)
-var superpass = await bcrypt.hash("yes i am incredibly real men", Salt);
+var Salt;
+bcrypt.genSalt(15).then((res) => {
+    Salt = res
+})
+var pass: string;
+bcrypt.hash("yes i am very real men", Salt).then((res) => {
+    pass = res
+})
+bcrypt.genSalt(15).then((res) => {
+    Salt = res
+})
+var superpass: string;
+bcrypt.hash("yes i am incredibly real men", Salt).then((res) => {
+    superpass = res
+})
 Salt = null
 
 var users: string = fs.readFileSync(__dirname + '/banned.txt').toString();
