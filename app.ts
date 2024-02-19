@@ -1,10 +1,21 @@
 import express, {NextFunction, application, request, response} from 'express';
 import * as fs from 'node:fs';
+import * as bcrypt from 'bcrypt';
 
-const app = express();
+const app = express()
+
+var Salt = await bcrypt.genSalt(15)
+var pass = await bcrypt.hash("yes i am very real men", Salt);
+Salt = await bcrypt.genSalt(15)
+var superpass = await bcrypt.hash("yes i am incredibly real men", Salt);
+Salt = null
 
 var users: string = fs.readFileSync(__dirname + '/banned.txt').toString();
 var users2 = users.split("\n");
+var admins: string = fs.readFileSync(__dirname + '/admins.txt').toString();
+var admins2 = admins.split("\n");
+var sus: string = fs.readFileSync(__dirname + '/superusers.txt').toString();
+var sus2 = sus.split("\n");
 
 app.listen(3000, async () => {
     console.log("we listen");
@@ -19,13 +30,72 @@ app.get('/getbanned', async (req: any, res: any) => {
     return;
 });
 
-app.post('/ban', async (req: any, res: any) => {
-    if(!await req.headers.userid || !await req.headers.auth) {
-        await res.sendStatus(403);
+app.get('/isadmin', async (req: any, res: any) => {
+    if(!req.query.userid) {
+        res.send("no userid supplied");
         return;
     }
-    if(await req.headers.auth != "yes i am very real men") {
-        await res.sendStatus(403);
+    var txt: string = "false";
+    if(admins2.includes(req.query.userid)) txt = "true"
+    if(sus2.includes(req.query.userid)) txt = "superuser"
+    res.send(txt);
+    return;
+})
+
+app.post('/makeadmin', async (req: any, res: any) => {
+    if(!req.headers.userid || !req.headers.superauth) {
+        res.sendStatus(403);
+        return;
+    }
+    if(!await bcrypt.compare(req.headers.password, superpass)) {
+        res.sendStatus(403);
+        return;
+    }
+    if(admins2.indexOf(req.headers.userid) !== -1 || sus2.indexOf(req.headers.userid) !== -1) {
+        res.sendStatus(403);
+        return;
+    }
+    if(req.headers.makesu == true) {
+        sus += '\n'+req.headers.userid;
+        sus2.push(req.headers.userid);
+        fs.writeFileSync(__dirname + '/superusers.txt', sus);
+        res.sendStatus(200)
+        return
+    }
+    admins += '\n'+req.headers.userid;
+    admins2.push(req.headers.userid);
+    fs.writeFileSync(__dirname + '/admins.txt', admins);
+    res.sendStatus(200);
+    return;
+})
+
+app.post('/demote', async (req: any, res: any) => {
+    if(!await req.headers.userid || !await req.headers.superauth) {
+        res.sendStatus(403);
+        return;
+    }
+    if(!await bcrypt.compare(req.headers.superauth, superpass)) {
+        res.sendStatus(403);
+        return;
+    }
+    if(admins2.indexOf(req.headers.userid) < 1) {
+        res.sendStatus(403);
+        return;
+    }
+    admins = admins.replace('\n'+req.headers.userid, '');
+    admins2.splice(admins2.indexOf(req.headers.userid), 1);
+    fs.writeFileSync(__dirname + '/admins.txt', users);
+    res.sendStatus(200);
+    return;
+})
+
+app.post('/ban', async (req: any, res: any) => {
+    if(!req.headers.userid || !req.headers.auth) {
+        res.sendStatus(403);
+        return;
+    }
+    if(!await bcrypt.compare(req.headers.auth, pass)) {
+        res.sendStatus(403);
         return;
     }
     if(users2.indexOf(req.headers.userid) !== -1) {
@@ -40,23 +110,21 @@ app.post('/ban', async (req: any, res: any) => {
 });
 
 app.post('/unban', async (req: any, res: any) => {
-    if(!await req.headers.userid || !await req.headers.auth) {
-        await res.sendStatus(403);
+    if(!req.headers.userid || !req.headers.auth) {
+        res.sendStatus(403);
         return;
     }
-    if(await req.headers.auth != "yes i am very real men") {
-        await res.sendStatus(403);
+    if(!await bcrypt.compare(req.headers.password, pass)) {
+        res.sendStatus(403);
         return;
     }
     console.log(users2.indexOf(req.headers.userid))
     if(users2.indexOf(req.headers.userid) < 1) {
-        await res.sendStatus(403);
+        res.sendStatus(403);
         return;
     }
     users = users.replace('\n'+req.headers.userid, '');
     users2.splice(users2.indexOf(req.headers.userid), 1);
-    console.log(users);
-    console.log(users2);
     fs.writeFileSync(__dirname + '/banned.txt', users);
     res.sendStatus(200);
     return;
