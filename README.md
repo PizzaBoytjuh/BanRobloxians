@@ -4,10 +4,5 @@ Might not be that good/clean, this is my first project written with typescript i
 Roblox model file/lua file in [releases](https://github.com/PizzaBoytjuh/BanRobloxians/releases/latest)
 <h1>Build</h1>
 You can easily build the server with npx tsc (if you already have ts-node), then do node app.js to start execution.
-
-Dependencies:
->expressjs (npm i express)
->
->ts-node (npm i ts-node)
->
->Or use npm i to download them both
+# TODO
+> Rewrite in GO
