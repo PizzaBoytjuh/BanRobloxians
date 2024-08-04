@@ -7,3 +7,5 @@ You can easily build the server with npx tsc (if you already have ts-node), then
 
 # TODO
 > Rewrite in GO
+>
+> Add SQLite support
